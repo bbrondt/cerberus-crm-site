@@ -9,10 +9,13 @@ const footerLinks = {
   Company: [
     { label: "About", href: "#" },
     { label: "Contact", href: "#" },
+    { label: "Support", href: "mailto:support@cerberuscrm.com" },
   ],
   Legal: [
-    { label: "Privacy Policy", href: "#" },
-    { label: "Terms of Service", href: "#" },
+    { label: "Privacy Policy", href: "/privacy" },
+    { label: "Terms of Service", href: "/terms" },
+    { label: "Cookie Policy", href: "/cookies" },
+    { label: "Disclaimer", href: "/disclaimer" },
   ],
 };
 
@@ -59,16 +62,10 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div className="mt-14 pt-8 border-t border-white/5 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="text-xs text-cerberus-steel-dark">
-            &copy; {new Date().getFullYear()} Cerberus CRM. All rights reserved.
-          </p>
-          <p className="text-xs text-cerberus-steel-dark">
-            A{" "}
-            <Link href="https://thebrondtcookgroup.com" className="hover:text-white transition-colors" target="_blank">
-              Brondt Cook Holdings
-            </Link>{" "}
-            product.
+        <div className="mt-14 pt-8 border-t border-white/5">
+          <p className="text-xs text-cerberus-steel-dark text-center">
+            &copy; {new Date().getFullYear()} Cerberus CRM. All rights
+            reserved.
           </p>
         </div>
       </div>
