@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 export default function LoginPage() {
   return (
@@ -8,9 +9,13 @@ export default function LoginPage() {
 
       <div className="relative w-full max-w-md mx-auto px-6">
         <div className="text-center mb-8">
-          <div className="w-12 h-12 rounded-xl gradient-red flex items-center justify-center font-display font-bold text-lg text-white mx-auto mb-6">
-            C
-          </div>
+          <Image
+            src="/cerberus-logo.png"
+            alt="Cerberus CRM"
+            width={56}
+            height={56}
+            className="w-14 h-14 object-contain mx-auto mb-6"
+          />
           <h1 className="font-display font-bold text-2xl text-white mb-2">
             Welcome Back
           </h1>

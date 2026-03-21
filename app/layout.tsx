@@ -4,13 +4,13 @@ import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Cerberus CRM — The Marketing Engine for Mortgage Pros",
+  title: "Cerberus CRM — The Marketing Flywheel for Mortgage Pros",
   description:
-    "Cerberus CRM gives mortgage loan officers the marketing automation, content engine, and lead management tools they need to dominate their market.",
+    "Cerberus CRM is the all-in-one marketing flywheel that replaces your CRM, content tools, funnel builder, ad creator, and webinar platform — built by a loan officer, for loan officers.",
   openGraph: {
-    title: "Cerberus CRM — The Marketing Engine for Mortgage Pros",
+    title: "Cerberus CRM — The Marketing Flywheel for Mortgage Pros",
     description:
-      "Marketing automation, content engine, and lead management built for mortgage loan officers.",
+      "The complete marketing engine that replaces your CRM, content tools, funnel builder, and webinar platform. Built by a loan officer, for loan officers.",
     type: "website",
   },
 };

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { Menu, X } from "lucide-react";
 
 const navLinks = [
@@ -17,10 +18,14 @@ export default function Navbar() {
     <header className="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/5">
       <nav className="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
         {/* Logo */}
-        <Link href="/" className="flex items-center gap-2 group">
-          <div className="w-8 h-8 rounded-lg gradient-red flex items-center justify-center font-display font-bold text-sm text-white">
-            C
-          </div>
+        <Link href="/" className="flex items-center gap-2.5 group">
+          <Image
+            src="/cerberus-logo.png"
+            alt="Cerberus CRM"
+            width={36}
+            height={36}
+            className="w-9 h-9 object-contain"
+          />
           <span className="font-display font-semibold text-lg text-white">
             Cerberus<span className="text-cerberus-steel ml-0.5">CRM</span>
           </span>

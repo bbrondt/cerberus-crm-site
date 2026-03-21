@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import LegalModal from "./LegalModal";
 
 type PolicyKey = "privacy" | "terms" | "cookies" | "disclaimer";
@@ -35,17 +36,22 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="flex items-center gap-2 mb-4">
-                <div className="w-7 h-7 rounded-md gradient-red flex items-center justify-center font-display font-bold text-xs text-white">
-                  C
-                </div>
+              <Link href="/" className="flex items-center gap-2.5 mb-4">
+                <Image
+                  src="/cerberus-logo.png"
+                  alt="Cerberus CRM"
+                  width={28}
+                  height={28}
+                  className="w-7 h-7 object-contain"
+                />
                 <span className="font-display font-semibold text-white">
                   Cerberus
                   <span className="text-cerberus-steel ml-0.5">CRM</span>
                 </span>
               </Link>
               <p className="text-sm text-cerberus-steel-dark leading-relaxed">
-                The marketing engine built for mortgage professionals.
+                The complete marketing flywheel built for mortgage
+                professionals.
               </p>
             </div>
 
@@ -87,7 +93,7 @@ export default function Footer() {
               </ul>
             </div>
 
-            {/* Legal - opens lightboxes */}
+            {/* Legal */}
             <div>
               <h4 className="font-display font-semibold text-sm text-white mb-4">
                 Legal

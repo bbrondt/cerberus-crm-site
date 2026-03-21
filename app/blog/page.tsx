@@ -1,21 +1,20 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 
-// Placeholder posts — we'll replace this with a CMS or MDX later
 const posts = [
   {
     slug: "why-loan-officers-need-marketing-system",
-    title: "Why Every Loan Officer Needs a Marketing System (Not Just a CRM)",
+    title: "Why Every Loan Officer Needs a Marketing Flywheel (Not Just a CRM)",
     excerpt:
-      "Most CRMs are glorified contact lists. Here's why a real marketing system is the difference between surviving and dominating your market.",
+      "Most CRMs are glorified contact lists. A real marketing flywheel connects your content, ads, webinars, and follow-up into a system that compounds over time — not just stores phone numbers.",
     date: "2026-03-20",
     category: "Marketing",
   },
   {
-    slug: "facebook-ads-mortgage-2026",
+    slug: "four-campaign-facebook-ad-framework",
     title: "The 4-Campaign Facebook Ad Framework for Mortgage Professionals",
     excerpt:
-      "Omnipresence, Video Views, Testing, Scaling — the proven structure that turns cold traffic into warm leads without burning your budget.",
+      "Omnipresence, Webinar Enrollment, Creative Testing, Scaling — the proven structure that turns cold traffic into warm leads. Launch 10 new ads every two weeks. Move winners to scaling. Repeat.",
     date: "2026-03-15",
     category: "Advertising",
   },
@@ -23,9 +22,26 @@ const posts = [
     slug: "ai-content-mortgage-marketing",
     title: "How to Use AI Content Without Sounding Like a Robot",
     excerpt:
-      "AI-generated content is only as good as the person directing it. Here's how to use it to amplify your voice — not replace it.",
+      "AI-generated content is only as good as the person directing it. Analyze your voice, feed it your transcripts, and create content that matches how you actually talk — not generic fluff.",
     date: "2026-03-10",
     category: "Content",
+  },
+  {
+    slug: "self-employed-borrower-webinar-strategy",
+    title:
+      "The Self-Employed Borrower Webinar: How to Close One Deal Every Two Webinars",
+    excerpt:
+      "The entire conventional mortgage system was designed for W2 employees. Self-employed borrowers are underserved and hungry for solutions. Here's the webinar framework that converts them.",
+    date: "2026-03-05",
+    category: "Webinars",
+  },
+  {
+    slug: "stop-depending-on-realtor-referrals",
+    title: "Stop Depending on Realtor Referrals. Build a Direct Pipeline.",
+    excerpt:
+      "Referral partners are great. But if your entire business depends on someone else sending you leads, you don't have a business — you have a dependency. Here's how to build both.",
+    date: "2026-02-28",
+    category: "Strategy",
   },
 ];
 
@@ -41,7 +57,7 @@ export default function BlogPage() {
           </h1>
           <p className="text-lg text-cerberus-steel max-w-xl mx-auto">
             Marketing strategies, industry insights, and real talk for mortgage
-            professionals who want to grow.
+            professionals who want to grow — not just post and pray.
           </p>
         </div>
       </section>
