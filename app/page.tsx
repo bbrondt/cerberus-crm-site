@@ -237,39 +237,60 @@ export default function HomePage() {
       <section className="py-20 md:py-32 relative border-t border-white/5">
         <div className="absolute inset-0 noise pointer-events-none" />
         <div className="relative max-w-7xl mx-auto px-6">
-          <div className="max-w-3xl mx-auto">
-            <div className="flex items-center gap-3 mb-8">
-              <Quote size={24} className="text-cerberus-red/40 shrink-0" />
-              <span className="text-xs font-medium text-cerberus-steel-dark uppercase tracking-widest">
-                The Origin Story
-              </span>
+          <div className="max-w-5xl mx-auto flex flex-col md:flex-row gap-12 md:gap-16 items-start">
+            {/* Founder Image */}
+            <div className="shrink-0 mx-auto md:mx-0">
+              <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border border-dark-400 bg-dark-700">
+                <Image
+                  src="/founder-placeholder.svg"
+                  alt="Brad Brondt — Founder, Cerberus CRM"
+                  width={224}
+                  height={224}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+              <div className="mt-4 text-center md:text-left">
+                <p className="font-display font-semibold text-white text-sm">
+                  Brad Brondt
+                </p>
+                <p className="text-xs text-cerberus-steel-dark">
+                  Founder, Cerberus CRM
+                </p>
+              </div>
             </div>
-            <h2 className="font-display font-bold text-2xl md:text-3xl tracking-tight mb-6 text-white">
-              This thing accidentally became its own business.
-            </h2>
-            <div className="space-y-4 text-cerberus-steel leading-relaxed">
-              <p>
-                In 2020, I built a marketing system on GoHighLevel for my own
-                mortgage business. Pipeline management, automated follow-up,
-                content generation, referral tracking, webinar funnels — all the
-                stuff I needed to stop depending solely on realtor referrals and
-                build a direct-to-consumer pipeline.
-              </p>
-              <p>
-                Then other loan officers in my network kept asking to buy what I
-                had built rather than go through the journey of building it
-                themselves. That&apos;s how Cerberus CRM was born — not from a
-                business plan, but from solving my own problems first and
-                discovering that everyone had the same pain.
-              </p>
-              <p className="text-white font-medium">
-                The best businesses are born from solving your own problems. I
-                don&apos;t like doing stuff that takes time — so I build
-                something to fix it.
-              </p>
-            </div>
-            <div className="mt-6 text-sm text-cerberus-steel-dark">
-              — Brad Brondt, Founder
+
+            {/* Story */}
+            <div className="flex-1">
+              <div className="flex items-center gap-3 mb-8">
+                <Quote size={24} className="text-cerberus-red/40 shrink-0" />
+                <span className="text-xs font-medium text-cerberus-steel-dark uppercase tracking-widest">
+                  The Origin Story
+                </span>
+              </div>
+              <h2 className="font-display font-bold text-2xl md:text-3xl tracking-tight mb-6 text-white">
+                This thing accidentally became its own business.
+              </h2>
+              <div className="space-y-4 text-cerberus-steel leading-relaxed">
+                <p>
+                  In 2020, I built a marketing system on GoHighLevel for my own
+                  mortgage business. Pipeline management, automated follow-up,
+                  content generation, referral tracking, webinar funnels — all
+                  the stuff I needed to stop depending solely on realtor
+                  referrals and build a direct-to-consumer pipeline.
+                </p>
+                <p>
+                  Then other loan officers in my network kept asking to buy what
+                  I had built rather than go through the journey of building it
+                  themselves. That&apos;s how Cerberus CRM was born — not from a
+                  business plan, but from solving my own problems first and
+                  discovering that everyone had the same pain.
+                </p>
+                <p className="text-white font-medium">
+                  The best businesses are born from solving your own problems. I
+                  don&apos;t like doing stuff that takes time — so I build
+                  something to fix it.
+                </p>
+              </div>
             </div>
           </div>
         </div>

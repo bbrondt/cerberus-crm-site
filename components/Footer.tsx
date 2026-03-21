@@ -36,18 +36,14 @@ export default function Footer() {
           <div className="grid grid-cols-2 md:grid-cols-4 gap-10">
             {/* Brand */}
             <div className="col-span-2 md:col-span-1">
-              <Link href="/" className="flex items-center gap-2.5 mb-4">
+              <Link href="/" className="inline-block mb-4">
                 <Image
                   src="/cerberus-logo.png"
                   alt="Cerberus CRM"
-                  width={28}
-                  height={28}
-                  className="w-7 h-7 object-contain"
+                  width={120}
+                  height={40}
+                  className="h-9 w-auto object-contain"
                 />
-                <span className="font-display font-semibold text-white">
-                  Cerberus
-                  <span className="text-cerberus-steel ml-0.5">CRM</span>
-                </span>
               </Link>
               <p className="text-sm text-cerberus-steel-dark leading-relaxed">
                 The complete marketing flywheel built for mortgage
