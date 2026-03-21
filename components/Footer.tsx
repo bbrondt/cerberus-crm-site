@@ -40,9 +40,9 @@ export default function Footer() {
                 <Image
                   src="/cerberus-logo.png"
                   alt="Cerberus CRM"
-                  width={120}
-                  height={40}
-                  className="h-9 w-auto object-contain"
+                  width={160}
+                  height={48}
+                  className="h-12 w-auto object-contain"
                 />
               </Link>
               <p className="text-sm text-cerberus-steel-dark leading-relaxed">
