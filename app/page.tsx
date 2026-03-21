@@ -241,11 +241,10 @@ export default function HomePage() {
             {/* Founder Image */}
             <div className="shrink-0 mx-auto md:mx-0">
               <div className="w-48 h-48 md:w-56 md:h-56 rounded-2xl overflow-hidden border border-dark-400 bg-dark-700">
-                <Image
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
                   src="/brad-brondt-headshot.png"
                   alt="Brad Brondt — Founder, Cerberus CRM"
-                  width={224}
-                  height={224}
                   className="w-full h-full object-cover"
                 />
               </div>
