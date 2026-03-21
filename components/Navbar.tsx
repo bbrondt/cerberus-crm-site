@@ -16,15 +16,15 @@ export default function Navbar() {
 
   return (
     <header className="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-xl border-b border-white/5">
-      <nav className="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+      <nav className="max-w-7xl mx-auto px-6 h-28 flex items-center justify-between">
         {/* Logo */}
         <Link href="/" className="flex items-center group">
           <Image
             src="/cerberus-logo.png"
             alt="Cerberus CRM"
-            width={200}
-            height={56}
-            className="h-14 w-auto object-contain"
+            width={500}
+            height={140}
+            className="h-36 w-auto object-contain"
           />
         </Link>
 
