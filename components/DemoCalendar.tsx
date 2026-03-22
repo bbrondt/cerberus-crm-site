@@ -383,8 +383,8 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
                       : isPast
                       ? "text-cerberus-steel-dark/40 cursor-not-allowed"
                       : hasSlots
-                      ? "text-white bg-dark-600 border border-dark-400 hover:border-cerberus-red/40 hover:bg-dark-500 cursor-pointer"
-                      : "text-cerberus-steel-dark bg-dark-800/50 cursor-not-allowed"
+                      ? "text-white bg-dark-500 border border-cerberus-steel/20 hover:border-cerberus-red/50 hover:bg-dark-400 cursor-pointer"
+                      : "text-cerberus-steel-dark/50 bg-transparent cursor-not-allowed"
                   } ${isToday && !isSelected ? "ring-1 ring-cerberus-red/30" : ""}`}
                 >
                   {day}

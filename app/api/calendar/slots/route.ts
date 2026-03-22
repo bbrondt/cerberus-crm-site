@@ -9,7 +9,7 @@ export async function GET(req: NextRequest) {
     if (!GHL_API_KEY || !GHL_CALENDAR_ID) {
       console.error("Missing GHL_API_KEY or GHL_CALENDAR_ID");
       return NextResponse.json(
-        { error: "Calendar not configured" },
+        { error: "Calendar not configured", detail: "Missing API key or Calendar ID" },
         { status: 500 }
       );
     }
@@ -26,12 +26,18 @@ export async function GET(req: NextRequest) {
       );
     }
 
+    // GHL expects startDate/endDate as epoch milliseconds
+    const startMs = new Date(`${startDate}T00:00:00`).getTime();
+    const endMs = new Date(`${endDate}T23:59:59`).getTime();
+
     const url = new URL(
       `${GHL_BASE_URL}/calendars/${GHL_CALENDAR_ID}/free-slots`
     );
-    url.searchParams.set("startDate", startDate);
-    url.searchParams.set("endDate", endDate);
+    url.searchParams.set("startDate", startMs.toString());
+    url.searchParams.set("endDate", endMs.toString());
     url.searchParams.set("timezone", timezone);
+
+    console.log("GHL free-slots request:", url.toString());
 
     const res = await fetch(url.toString(), {
       headers: {
@@ -41,23 +47,35 @@ export async function GET(req: NextRequest) {
       },
     });
 
+    const responseText = await res.text();
+    console.log("GHL free-slots response:", res.status, responseText.substring(0, 500));
+
     if (!res.ok) {
-      const errorText = await res.text();
-      console.error("GHL free-slots error:", res.status, errorText);
       return NextResponse.json(
-        { error: "Failed to fetch availability" },
+        {
+          error: "Failed to fetch availability",
+          status: res.status,
+          ghlError: responseText.substring(0, 500),
+        },
         { status: res.status }
       );
     }
 
-    const data = await res.json();
+    let data;
+    try {
+      data = JSON.parse(responseText);
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid response from calendar API", raw: responseText.substring(0, 200) },
+        { status: 500 }
+      );
+    }
 
-    // data should have a structure like { calendarId, dateRange, slots: { "2026-03-23": [{ slot: "2026-03-23T12:00:00-04:00" }, ...] } }
     return NextResponse.json(data);
   } catch (err) {
     console.error("Calendar slots error:", err);
     return NextResponse.json(
-      { error: "Internal server error" },
+      { error: "Internal server error", detail: String(err) },
       { status: 500 }
     );
   }
