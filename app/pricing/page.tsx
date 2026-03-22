@@ -143,7 +143,7 @@ export default function PricingPage() {
               </ul>
 
               <Link
-                href="#"
+                href="/demo"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg gradient-red text-white font-medium text-sm hover:opacity-90 transition-all duration-200"
               >
                 Schedule a Demo

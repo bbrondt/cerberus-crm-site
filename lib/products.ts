@@ -107,7 +107,7 @@ export const productCatalog: Record<string, ProductConfig> = {
     ghlPlanName: "vortex",
     active: true,
     requiresDemo: true,
-    demoUrl: "#", // Replace with your actual booking link
+    demoUrl: "/demo",
   },
 
   // ─── EXAMPLE: Future products ─────────────────────────────
