@@ -9,6 +9,7 @@ import {
   CheckCircle,
   Calendar,
   ArrowLeft,
+  AlertCircle,
 } from "lucide-react";
 
 interface Slot {
@@ -30,13 +31,17 @@ const MONTHS = [
 ];
 
 function formatTime(isoString: string): string {
-  const date = new Date(isoString);
-  return date.toLocaleTimeString("en-US", {
-    hour: "numeric",
-    minute: "2-digit",
-    hour12: true,
-    timeZone: "America/New_York",
-  });
+  try {
+    const date = new Date(isoString);
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+      hour12: true,
+      timeZone: "America/New_York",
+    });
+  } catch {
+    return isoString;
+  }
 }
 
 function formatDateDisplay(dateStr: string): string {
@@ -53,10 +58,8 @@ function getMonthDays(year: number, month: number) {
   const firstDay = new Date(year, month, 1).getDay();
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const days: (number | null)[] = [];
-
   for (let i = 0; i < firstDay; i++) days.push(null);
   for (let d = 1; d <= daysInMonth; d++) days.push(d);
-
   return days;
 }
 
@@ -70,8 +73,9 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
   const [currentYear, setCurrentYear] = useState(today.getFullYear());
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
   const [selectedSlot, setSelectedSlot] = useState<string | null>(null);
-  const [slots, setSlots] = useState<SlotsMap>({});
-  const [loadingSlots, setLoadingSlots] = useState(false);
+  const [allSlots, setAllSlots] = useState<SlotsMap>({});
+  const [loadingMonth, setLoadingMonth] = useState(true);
+  const [monthError, setMonthError] = useState<string | null>(null);
   const [step, setStep] = useState<"calendar" | "form" | "confirmed">("calendar");
 
   // Form fields
@@ -82,36 +86,53 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
   const [booking, setBooking] = useState(false);
   const [bookingError, setBookingError] = useState<string | null>(null);
 
-  const fetchSlots = useCallback(async (year: number, month: number) => {
-    setLoadingSlots(true);
+  const todayStr = toDateString(today.getFullYear(), today.getMonth(), today.getDate());
+
+  // Load full month availability
+  const fetchMonthSlots = useCallback(async (year: number, month: number) => {
+    setLoadingMonth(true);
+    setMonthError(null);
+    setAllSlots({});
+
     try {
       const startDate = `${year}-${String(month + 1).padStart(2, "0")}-01`;
       const lastDay = new Date(year, month + 1, 0).getDate();
-      const endDate = `${year}-${String(month + 1).padStart(2, "0")}-${lastDay}`;
+      const endDate = `${year}-${String(month + 1).padStart(2, "0")}-${String(lastDay).padStart(2, "0")}`;
 
       const res = await fetch(
         `/api/calendar/slots?startDate=${startDate}&endDate=${endDate}&timezone=America/New_York`
       );
 
-      if (res.ok) {
-        const data = await res.json();
-        setSlots(data.slots || data || {});
-      } else {
-        console.error("Failed to fetch slots");
-        setSlots({});
+      const data = await res.json();
+
+      if (!res.ok) {
+        console.error("Month slots error:", data);
+        setMonthError(data.ghlError || data.error || "Failed to load availability");
+        setLoadingMonth(false);
+        return;
       }
-    } catch {
-      console.error("Error fetching slots");
-      setSlots({});
+
+      // GHL response format: { "YYYY-MM-DD": [{ slot: "..." }, ...], ... }
+      // or { slots: { "YYYY-MM-DD": [...] } }
+      const slotsData: SlotsMap = data.slots || data || {};
+      setAllSlots(slotsData);
+    } catch (err) {
+      console.error("Fetch month error:", err);
+      setMonthError("Failed to connect to calendar");
     }
-    setLoadingSlots(false);
+
+    setLoadingMonth(false);
   }, []);
 
   useEffect(() => {
-    fetchSlots(currentYear, currentMonth);
-  }, [currentYear, currentMonth, fetchSlots]);
+    fetchMonthSlots(currentYear, currentMonth);
+  }, [currentYear, currentMonth, fetchMonthSlots]);
 
   const goToPrevMonth = () => {
+    const prevIsBeforeCurrent =
+      currentYear === today.getFullYear() && currentMonth <= today.getMonth();
+    if (prevIsBeforeCurrent) return;
+
     if (currentMonth === 0) {
       setCurrentMonth(11);
       setCurrentYear(currentYear - 1);
@@ -135,8 +156,10 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
 
   const handleDateClick = (day: number) => {
     const dateStr = toDateString(currentYear, currentMonth, day);
-    const todayStr = toDateString(today.getFullYear(), today.getMonth(), today.getDate());
     if (dateStr < todayStr) return;
+
+    const hasSlots = allSlots[dateStr] && allSlots[dateStr].length > 0;
+    if (!hasSlots) return;
 
     setSelectedDate(dateStr);
     setSelectedSlot(null);
@@ -179,8 +202,7 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
   };
 
   const days = getMonthDays(currentYear, currentMonth);
-  const todayStr = toDateString(today.getFullYear(), today.getMonth(), today.getDate());
-  const selectedDateSlots = selectedDate ? (slots[selectedDate] || []) : [];
+  const selectedDateSlots = selectedDate ? (allSlots[selectedDate] || []) : [];
 
   // ─── Confirmed state ───
   if (step === "confirmed") {
@@ -326,111 +348,127 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
     <div>
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Calendar grid */}
-        <div className="flex-1">
+        <div className="flex-1 min-w-0">
           {/* Month nav */}
           <div className="flex items-center justify-between mb-5">
             <button
               onClick={goToPrevMonth}
-              className="w-8 h-8 rounded-lg bg-dark-600 border border-dark-400 flex items-center justify-center text-cerberus-steel hover:text-white hover:border-cerberus-steel/30 transition-all"
+              className="w-9 h-9 rounded-lg bg-dark-600 border border-dark-400 flex items-center justify-center text-cerberus-steel hover:text-white hover:border-cerberus-steel/30 transition-all"
             >
               <ChevronLeft size={16} />
             </button>
-            <h3 className="font-display font-semibold text-white">
+            <h3 className="font-display font-semibold text-white text-lg">
               {MONTHS[currentMonth]} {currentYear}
             </h3>
             <button
               onClick={goToNextMonth}
-              className="w-8 h-8 rounded-lg bg-dark-600 border border-dark-400 flex items-center justify-center text-cerberus-steel hover:text-white hover:border-cerberus-steel/30 transition-all"
+              className="w-9 h-9 rounded-lg bg-dark-600 border border-dark-400 flex items-center justify-center text-cerberus-steel hover:text-white hover:border-cerberus-steel/30 transition-all"
             >
               <ChevronRight size={16} />
             </button>
           </div>
 
           {/* Day headers */}
-          <div className="grid grid-cols-7 gap-1 mb-2">
+          <div className="grid grid-cols-7 gap-1.5 mb-2">
             {DAYS.map((day) => (
               <div
                 key={day}
-                className="text-center text-xs font-medium text-cerberus-steel-dark py-1"
+                className="text-center text-xs font-semibold text-cerberus-steel py-2"
               >
                 {day}
               </div>
             ))}
           </div>
 
-          {/* Day cells */}
-          <div className="grid grid-cols-7 gap-1">
-            {days.map((day, i) => {
-              if (day === null) {
-                return <div key={`empty-${i}`} className="aspect-square" />;
-              }
+          {/* Loading state */}
+          {loadingMonth ? (
+            <div className="flex items-center justify-center gap-3 py-20">
+              <Loader2 size={20} className="text-cerberus-red animate-spin" />
+              <span className="text-sm text-cerberus-steel">Loading availability...</span>
+            </div>
+          ) : monthError ? (
+            <div className="flex flex-col items-center justify-center py-16 text-center">
+              <AlertCircle size={24} className="text-cerberus-steel-dark mb-3" />
+              <p className="text-sm text-cerberus-steel-dark mb-3">
+                Couldn&apos;t load calendar availability.
+              </p>
+              <button
+                onClick={() => fetchMonthSlots(currentYear, currentMonth)}
+                className="text-sm text-cerberus-red-light hover:text-white transition-colors"
+              >
+                Try again
+              </button>
+            </div>
+          ) : (
+            /* Day cells */
+            <div className="grid grid-cols-7 gap-1.5">
+              {days.map((day, i) => {
+                if (day === null) {
+                  return <div key={`empty-${i}`} className="aspect-square" />;
+                }
 
-              const dateStr = toDateString(currentYear, currentMonth, day);
-              const isPast = dateStr < todayStr;
-              const isToday = dateStr === todayStr;
-              const isSelected = dateStr === selectedDate;
-              const hasSlots =
-                slots[dateStr] && slots[dateStr].length > 0;
+                const dateStr = toDateString(currentYear, currentMonth, day);
+                const isPast = dateStr < todayStr;
+                const isToday = dateStr === todayStr;
+                const isSelected = dateStr === selectedDate;
+                const hasSlots = allSlots[dateStr] && allSlots[dateStr].length > 0;
+                const slotCount = allSlots[dateStr]?.length || 0;
 
-              return (
-                <button
-                  key={dateStr}
-                  onClick={() => !isPast && handleDateClick(day)}
-                  disabled={isPast}
-                  className={`aspect-square rounded-lg text-sm font-medium flex items-center justify-center transition-all duration-150 relative ${
-                    isSelected
-                      ? "gradient-red text-white glow-red"
-                      : isPast
-                      ? "text-cerberus-steel-dark/40 cursor-not-allowed"
-                      : hasSlots
-                      ? "text-white bg-dark-500 border border-cerberus-steel/20 hover:border-cerberus-red/50 hover:bg-dark-400 cursor-pointer"
-                      : "text-cerberus-steel-dark/50 bg-transparent cursor-not-allowed"
-                  } ${isToday && !isSelected ? "ring-1 ring-cerberus-red/30" : ""}`}
-                >
-                  {day}
-                  {hasSlots && !isSelected && !isPast && (
-                    <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1 h-1 rounded-full bg-cerberus-red" />
-                  )}
-                </button>
-              );
-            })}
-          </div>
-
-          {loadingSlots && (
-            <div className="flex items-center justify-center gap-2 mt-4 py-3">
-              <Loader2 size={14} className="text-cerberus-red animate-spin" />
-              <span className="text-xs text-cerberus-steel">
-                Loading availability...
-              </span>
+                return (
+                  <button
+                    key={dateStr}
+                    onClick={() => hasSlots && !isPast && handleDateClick(day)}
+                    disabled={isPast || !hasSlots}
+                    className={`aspect-square rounded-xl text-sm font-semibold flex flex-col items-center justify-center transition-all duration-150 relative ${
+                      isSelected
+                        ? "gradient-red text-white shadow-lg shadow-cerberus-red/25 scale-105"
+                        : isPast
+                        ? "text-dark-400 cursor-not-allowed"
+                        : hasSlots
+                        ? "text-white bg-dark-500 border border-cerberus-steel/25 hover:border-cerberus-red/60 hover:bg-dark-400 hover:scale-105 cursor-pointer"
+                        : "text-dark-400 cursor-not-allowed"
+                    } ${isToday && !isSelected ? "ring-2 ring-cerberus-red/40" : ""}`}
+                    title={hasSlots ? `${slotCount} time${slotCount > 1 ? "s" : ""} available` : undefined}
+                  >
+                    {day}
+                    {hasSlots && !isSelected && !isPast && (
+                      <span className="absolute bottom-1 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full bg-cerberus-red" />
+                    )}
+                  </button>
+                );
+              })}
             </div>
           )}
         </div>
 
         {/* Time slots panel */}
-        <div className="lg:w-48 lg:border-l lg:border-dark-400 lg:pl-6">
+        <div className="lg:w-52 lg:border-l lg:border-dark-400 lg:pl-6">
           {selectedDate ? (
             <>
-              <p className="text-xs font-medium text-cerberus-steel-dark uppercase tracking-wider mb-3">
+              <p className="text-xs font-semibold text-cerberus-steel uppercase tracking-wider mb-1">
+                Available Times
+              </p>
+              <p className="text-sm text-white font-medium mb-4">
                 {formatDateDisplay(selectedDate)}
               </p>
 
               {selectedDateSlots.length === 0 ? (
-                <p className="text-sm text-cerberus-steel-dark">
-                  No availability
+                <p className="text-sm text-cerberus-steel-dark py-6 text-center">
+                  No availability on this date.
                 </p>
               ) : (
-                <div className="space-y-2 max-h-64 overflow-y-auto custom-scrollbar">
+                <div className="space-y-2 max-h-72 overflow-y-auto custom-scrollbar pr-1">
                   {selectedDateSlots.map((s) => (
                     <button
                       key={s.slot}
                       onClick={() => setSelectedSlot(s.slot)}
-                      className={`w-full px-3 py-2.5 rounded-lg text-sm font-medium flex items-center gap-2 transition-all duration-150 ${
+                      className={`w-full px-3 py-3 rounded-xl text-sm font-medium flex items-center gap-2.5 transition-all duration-150 ${
                         selectedSlot === s.slot
-                          ? "gradient-red text-white"
-                          : "bg-dark-600 border border-dark-400 text-cerberus-steel hover:text-white hover:border-cerberus-red/30"
+                          ? "gradient-red text-white shadow-lg shadow-cerberus-red/20"
+                          : "bg-dark-600 border border-dark-400 text-cerberus-steel-light hover:text-white hover:border-cerberus-red/40"
                       }`}
                     >
-                      <Clock size={13} />
+                      <Clock size={14} />
                       {formatTime(s.slot)}
                     </button>
                   ))}
@@ -440,20 +478,19 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
               {selectedSlot && (
                 <button
                   onClick={() => setStep("form")}
-                  className="w-full mt-4 py-2.5 rounded-lg gradient-red text-white font-display font-semibold text-sm hover:opacity-90 transition-all duration-200"
+                  className="w-full mt-4 py-3 rounded-xl gradient-red text-white font-display font-semibold text-sm hover:opacity-90 transition-all duration-200"
                 >
                   Continue
                 </button>
               )}
             </>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full py-8 text-center">
-              <Calendar
-                size={20}
-                className="text-cerberus-steel-dark mb-2"
-              />
-              <p className="text-sm text-cerberus-steel-dark">
-                Select a date to see available times
+            <div className="flex flex-col items-center justify-center h-full py-10 text-center">
+              <Calendar size={24} className="text-cerberus-steel-dark mb-3" />
+              <p className="text-sm text-cerberus-steel">
+                Select a highlighted date
+                <br />
+                to see available times
               </p>
             </div>
           )}
