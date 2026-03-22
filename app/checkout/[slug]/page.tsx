@@ -62,6 +62,31 @@ export default function DynamicCheckoutPage() {
   const canProceed = name.trim() && email.trim() && phone.trim();
   const isRecurring = product.interval !== "one_time";
 
+  const handleContinueToPayment = async () => {
+    if (!canProceed) return;
+
+    // Fire lead data to GHL immediately (abandoned cart capture)
+    try {
+      fetch("/api/capture-lead", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name,
+          email,
+          phone,
+          company,
+          productSlug: product.slug,
+          productName: product.name,
+          ghlPlanName: product.ghlPlanName,
+        }),
+      });
+    } catch {
+      // Non-blocking — don't prevent checkout if lead capture fails
+    }
+
+    setStep("payment");
+  };
+
   return (
     <section className="relative min-h-screen pt-36 pb-20 overflow-hidden">
       {/* Background effects */}
@@ -286,7 +311,7 @@ export default function DynamicCheckoutPage() {
                 </div>
 
                 <button
-                  onClick={() => canProceed && setStep("payment")}
+                  onClick={handleContinueToPayment}
                   disabled={!canProceed}
                   className="w-full mt-8 inline-flex items-center justify-center gap-2 py-4 rounded-xl gradient-red text-white font-display font-semibold text-base hover:opacity-90 transition-all duration-200 disabled:opacity-40 disabled:cursor-not-allowed"
                 >
