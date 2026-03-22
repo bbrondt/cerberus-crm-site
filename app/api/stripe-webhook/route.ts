@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY!, {
-  apiVersion: "2025-02-24.acacia",
-});
-
-const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
+function getStripe() {
+  return new Stripe(process.env.STRIPE_SECRET_KEY!, {
+    apiVersion: "2025-02-24.acacia",
+  });
+}
 
 // GHL inbound webhook URL — set this in your environment variables
 const GHL_WEBHOOK_URL = process.env.GHL_INBOUND_WEBHOOK_URL;
 
 export async function POST(req: NextRequest) {
+  const stripe = getStripe();
+  const webhookSecret = process.env.STRIPE_WEBHOOK_SECRET!;
   const body = await req.text();
   const sig = req.headers.get("stripe-signature");
 
