@@ -57,6 +57,18 @@ async function findOrCreateContact(
   if (!createRes.ok) {
     const errorText = await createRes.text();
     console.error("GHL create contact error:", createRes.status, errorText);
+
+    // If duplicate contact error, GHL returns the existing contact ID in meta
+    try {
+      const errorData = JSON.parse(errorText);
+      if (errorData.meta?.contactId) {
+        console.log("Using existing contact:", errorData.meta.contactId);
+        return errorData.meta.contactId;
+      }
+    } catch {
+      // Not JSON, fall through
+    }
+
     throw new Error("Failed to create contact");
   }
 
