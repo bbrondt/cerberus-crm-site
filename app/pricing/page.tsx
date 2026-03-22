@@ -93,7 +93,7 @@ export default function PricingPage() {
               </ul>
 
               <Link
-                href="#"
+                href="/checkout"
                 className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg font-medium text-sm transition-all duration-200 border border-dark-400 text-cerberus-steel hover:text-white hover:border-cerberus-steel/30"
               >
                 Get Started
