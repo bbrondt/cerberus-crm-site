@@ -112,10 +112,26 @@ export default function DemoCalendar({ onBooked }: DemoCalendarProps) {
         return;
       }
 
-      // GHL response format: { "YYYY-MM-DD": [{ slot: "..." }, ...], ... }
-      // or { slots: { "YYYY-MM-DD": [...] } }
-      const slotsData: SlotsMap = data.slots || data || {};
-      setAllSlots(slotsData);
+      // GHL actual response format:
+      // { "2026-03-23": { "slots": ["2026-03-23T11:00:00-04:00"] }, ... }
+      // Normalize to our internal format: { "2026-03-23": [{ slot: "..." }], ... }
+      const rawData = data.slots || data || {};
+      const normalized: SlotsMap = {};
+
+      for (const [dateKey, value] of Object.entries(rawData)) {
+        if (value && typeof value === "object") {
+          // Handle { slots: ["..."] } format
+          const dateValue = value as Record<string, unknown>;
+          if (Array.isArray(dateValue.slots)) {
+            normalized[dateKey] = (dateValue.slots as string[]).map((s) => ({ slot: s }));
+          } else if (Array.isArray(value)) {
+            // Handle [{ slot: "..." }] format
+            normalized[dateKey] = value as Slot[];
+          }
+        }
+      }
+
+      setAllSlots(normalized);
     } catch (err) {
       console.error("Fetch month error:", err);
       setMonthError("Failed to connect to calendar");
