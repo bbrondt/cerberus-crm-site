@@ -1,66 +1,39 @@
 "use client";
 
 import { useState } from "react";
+import Image from "next/image";
 import Link from "next/link";
-import { useParams, useRouter } from "next/navigation";
 import {
   Check,
   ArrowLeft,
   Shield,
   Clock,
   Headphones,
-  AlertCircle,
 } from "lucide-react";
 import StripeWrapper from "@/components/checkout/StripeWrapper";
-import { getProduct, type ProductConfig } from "@/lib/products";
 
-export default function DynamicCheckoutPage() {
-  const params = useParams();
-  const router = useRouter();
-  const slug = params.slug as string;
-  const product = getProduct(slug);
+const includedFeatures = [
+  "CRM & Pipeline Management",
+  "Automated Follow-Up Sequences",
+  "Lead Capture Forms & Funnels",
+  "Email & SMS Marketing",
+  "Mortgage Calculators",
+  "Referral Partner Management",
+  "Smart Lists & Contact Tagging",
+  "Website & Funnel Builder",
+  "Calendar & Appointment Booking",
+  "Workflow Automation Library",
+  "Community Access",
+];
 
+export default function CheckoutPage() {
   const [step, setStep] = useState<"info" | "payment">("info");
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [company, setCompany] = useState("");
 
-  // ─── Product not found ───
-  if (!product) {
-    return (
-      <section className="relative min-h-screen flex items-center justify-center pt-16 overflow-hidden">
-        <div className="absolute inset-0 noise pointer-events-none" />
-        <div className="max-w-md mx-auto px-6 text-center">
-          <div className="w-16 h-16 rounded-full bg-dark-600 flex items-center justify-center mx-auto mb-6">
-            <AlertCircle size={28} className="text-cerberus-steel" />
-          </div>
-          <h1 className="font-display font-bold text-2xl text-white mb-3">
-            Product Not Found
-          </h1>
-          <p className="text-cerberus-steel mb-8">
-            The product you&apos;re looking for doesn&apos;t exist or is no
-            longer available.
-          </p>
-          <Link
-            href="/pricing"
-            className="inline-flex items-center justify-center gap-2 px-6 py-3 rounded-lg gradient-red text-white font-medium text-sm hover:opacity-90 transition-all duration-200"
-          >
-            View Pricing
-          </Link>
-        </div>
-      </section>
-    );
-  }
-
-  // ─── Demo-required products redirect ───
-  if (product.requiresDemo && product.demoUrl) {
-    router.push(product.demoUrl);
-    return null;
-  }
-
   const canProceed = name.trim() && email.trim() && phone.trim();
-  const isRecurring = product.interval !== "one_time";
 
   return (
     <section className="relative min-h-screen pt-36 pb-20 overflow-hidden">
@@ -79,7 +52,7 @@ export default function DynamicCheckoutPage() {
         </Link>
 
         <div className="grid lg:grid-cols-5 gap-10 lg:gap-14">
-          {/* ─── Left Column: Order Summary ─── */}
+          {/* Left Column — Order Summary */}
           <div className="lg:col-span-2 order-2 lg:order-1">
             <div className="lg:sticky lg:top-36">
               <div className="card p-7">
@@ -89,15 +62,13 @@ export default function DynamicCheckoutPage() {
                     Your Plan
                   </p>
                   <h3 className="font-display font-bold text-xl text-white mb-1">
-                    {product.name}
+                    Cerberus CRM
                   </h3>
                   <div className="flex items-baseline gap-1">
                     <span className="text-3xl font-display font-800 text-white">
-                      {product.displayPrice}
+                      $497
                     </span>
-                    <span className="text-cerberus-steel text-sm">
-                      {product.billingLabel}
-                    </span>
+                    <span className="text-cerberus-steel text-sm">/month</span>
                   </div>
                 </div>
 
@@ -107,8 +78,11 @@ export default function DynamicCheckoutPage() {
                     Includes
                   </p>
                   <ul className="space-y-2.5">
-                    {product.features.map((feature) => (
-                      <li key={feature} className="flex items-start gap-2.5">
+                    {includedFeatures.map((feature) => (
+                      <li
+                        key={feature}
+                        className="flex items-start gap-2.5"
+                      >
                         <Check
                           size={14}
                           className="text-cerberus-red mt-0.5 shrink-0"
@@ -123,56 +97,43 @@ export default function DynamicCheckoutPage() {
 
                 {/* Guarantees */}
                 <div className="pt-6 space-y-4">
-                  {isRecurring && (
-                    <div className="flex items-start gap-3">
+                  {[
+                    {
+                      icon: Shield,
+                      title: "No Annual Contract",
+                      desc: "Month-to-month. Cancel anytime with zero hassle.",
+                    },
+                    {
+                      icon: Clock,
+                      title: "Same-Day Access",
+                      desc: "Your account is provisioned immediately after payment.",
+                    },
+                    {
+                      icon: Headphones,
+                      title: "Hands-On Onboarding",
+                      desc: "We walk you through setup on a 1-on-1 call.",
+                    },
+                  ].map((item) => (
+                    <div key={item.title} className="flex items-start gap-3">
                       <div className="w-8 h-8 rounded-lg bg-cerberus-red/10 flex items-center justify-center shrink-0">
-                        <Shield size={14} className="text-cerberus-red" />
+                        <item.icon size={14} className="text-cerberus-red" />
                       </div>
                       <div>
                         <p className="text-sm font-medium text-white leading-snug">
-                          No Annual Contract
+                          {item.title}
                         </p>
                         <p className="text-xs text-cerberus-steel-dark leading-relaxed">
-                          Month-to-month. Cancel anytime with zero hassle.
+                          {item.desc}
                         </p>
                       </div>
                     </div>
-                  )}
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-cerberus-red/10 flex items-center justify-center shrink-0">
-                      <Clock size={14} className="text-cerberus-red" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white leading-snug">
-                        Instant Access
-                      </p>
-                      <p className="text-xs text-cerberus-steel-dark leading-relaxed">
-                        {isRecurring
-                          ? "Your account is provisioned immediately after payment."
-                          : "Access is granted immediately after payment."}
-                      </p>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-lg bg-cerberus-red/10 flex items-center justify-center shrink-0">
-                      <Headphones size={14} className="text-cerberus-red" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-medium text-white leading-snug">
-                        Hands-On Support
-                      </p>
-                      <p className="text-xs text-cerberus-steel-dark leading-relaxed">
-                        We&apos;re here to help you get the most out of your
-                        purchase.
-                      </p>
-                    </div>
-                  </div>
+                  ))}
                 </div>
               </div>
             </div>
           </div>
 
-          {/* ─── Right Column: Checkout Form ─── */}
+          {/* Right Column — Checkout Form */}
           <div className="lg:col-span-3 order-1 lg:order-2">
             {/* Step indicator */}
             <div className="flex items-center gap-3 mb-8">
@@ -193,7 +154,11 @@ export default function DynamicCheckoutPage() {
                       : "bg-dark-500 text-cerberus-steel-dark"
                   }`}
                 >
-                  {step === "payment" ? <Check size={12} /> : "1"}
+                  {step === "payment" ? (
+                    <Check size={12} />
+                  ) : (
+                    "1"
+                  )}
                 </span>
                 Your Info
               </button>
@@ -227,8 +192,7 @@ export default function DynamicCheckoutPage() {
                   Let&apos;s get you set up
                 </h2>
                 <p className="text-sm text-cerberus-steel mb-8">
-                  We&apos;ll use this to create your account and send access
-                  details.
+                  We&apos;ll use this to create your Cerberus CRM account.
                 </p>
 
                 <div className="space-y-5">
@@ -240,7 +204,7 @@ export default function DynamicCheckoutPage() {
                       type="text"
                       value={name}
                       onChange={(e) => setName(e.target.value)}
-                      placeholder="Your full name"
+                      placeholder="Brad Brondt"
                       className="w-full px-4 py-3 rounded-xl bg-dark-800 border border-dark-400 text-white placeholder-cerberus-steel-dark text-sm focus:outline-none focus:border-cerberus-red focus:ring-2 focus:ring-cerberus-red/15 transition-all duration-200"
                     />
                   </div>
@@ -319,6 +283,22 @@ export default function DynamicCheckoutPage() {
                       Secure payment powered by Stripe
                     </p>
                   </div>
+                  <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-dark-600 border border-dark-400">
+                    <svg viewBox="0 0 28 12" className="h-3 w-auto">
+                      <path
+                        d="M13.976 3.078c0-1.035.863-1.432 1.521-1.432.677 0 1.26.345 1.826.863l1.07-1.329A4.165 4.165 0 0 0 15.59.002c-1.864 0-3.468 1.035-3.468 2.956 0 2.884 3.972 2.418 3.972 3.674 0 .604-.528 1.001-1.375 1.001-.87 0-1.657-.432-2.234-1.001l-1.174 1.38c.899.845 2.063 1.38 3.304 1.38 1.898 0 3.572-.942 3.572-3.023-.016-3.108-3.988-2.556-3.988-3.71l-.224.419z"
+                        fill="#adb5b5"
+                      />
+                      <path
+                        d="M5.62 0L3.85 5.942 2.08 0H0l2.729 8.655h2.165L7.632 0H5.62zM8.152 0h1.898v8.655H8.152V0zM23.988 0l-1.796 5.942L20.422 0h-2.08l2.729 8.655h2.165L26 0h-2.012z"
+                        fill="#adb5b5"
+                      />
+                    </svg>
+                    <svg viewBox="0 0 24 16" className="h-3 w-auto">
+                      <circle cx="9" cy="8" r="7" fill="#5a5a5a" />
+                      <circle cx="15" cy="8" r="7" fill="#6a6a6a" />
+                    </svg>
+                  </div>
                 </div>
 
                 {/* Customer summary */}
@@ -335,11 +315,7 @@ export default function DynamicCheckoutPage() {
                   </button>
                 </div>
 
-                <StripeWrapper
-                  customerEmail={email}
-                  customerName={name}
-                  product={product}
-                />
+                <StripeWrapper customerEmail={email} customerName={name} />
               </div>
             )}
           </div>

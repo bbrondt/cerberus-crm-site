@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import { getProduct } from "@/lib/products";
 
 function getStripe() {
   return new Stripe(process.env.STRIPE_SECRET_KEY!, {
@@ -11,7 +12,6 @@ export async function POST(req: NextRequest) {
   try {
     const stripe = getStripe();
     const {
-      priceId,
       customerEmail,
       customerName,
       productSlug,
@@ -19,10 +19,21 @@ export async function POST(req: NextRequest) {
       interval,
     } = await req.json();
 
-    if (!priceId) {
+    // ─── Resolve price ID server-side from product catalog ───
+    const product = getProduct(productSlug);
+    if (!product) {
       return NextResponse.json(
-        { error: "Missing price ID" },
+        { error: "Unknown product" },
         { status: 400 }
+      );
+    }
+
+    const priceId = process.env[product.priceIdEnvVar];
+    if (!priceId) {
+      console.error(`Missing env var: ${product.priceIdEnvVar}`);
+      return NextResponse.json(
+        { error: "Product not configured" },
+        { status: 500 }
       );
     }
 

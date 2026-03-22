@@ -25,8 +25,6 @@ export default function StripeWrapper({
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  const priceId = process.env[product.priceIdEnvVar];
-
   useEffect(() => {
     const createSession = async () => {
       try {
@@ -34,7 +32,6 @@ export default function StripeWrapper({
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            priceId,
             customerEmail,
             customerName,
             productSlug: product.slug,
@@ -58,7 +55,7 @@ export default function StripeWrapper({
     };
 
     createSession();
-  }, [customerEmail, customerName, priceId, product.slug, product.ghlPlanName, product.interval]);
+  }, [customerEmail, customerName, product.slug, product.ghlPlanName, product.interval]);
 
   if (error) {
     return (
