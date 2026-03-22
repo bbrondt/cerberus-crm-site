@@ -154,13 +154,6 @@ export const productCatalog: Record<string, ProductConfig> = {
   // },
 };
 
-/** Helper to get price ID from env at runtime */
-export function getStripePriceId(product: ProductConfig): string | undefined {
-  return typeof window !== "undefined"
-    ? (window as Record<string, unknown>)[`__ENV_${product.priceIdEnvVar}`] as string | undefined
-    : process.env[product.priceIdEnvVar];
-}
-
 /** Get a product by slug, returns undefined if not found or inactive */
 export function getProduct(slug: string): ProductConfig | undefined {
   const product = productCatalog[slug];
