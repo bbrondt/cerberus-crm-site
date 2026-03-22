@@ -1,5 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
+import Testimonials from "@/components/Testimonials";
 import {
   Zap,
   BarChart3,
@@ -294,6 +295,9 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+
+      {/* Testimonials */}
+      <Testimonials />
 
       {/* CTA Section */}
       <section className="py-20 md:py-32 relative">
