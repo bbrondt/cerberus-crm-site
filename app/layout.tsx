@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
+import StickyDemoCTA from "@/components/StickyDemoCTA";
 
 export const metadata: Metadata = {
   title: "Cerberus CRM — The Marketing Flywheel for Mortgage Pros",
@@ -26,6 +27,7 @@ export default function RootLayout({
         <Navbar />
         <main className="flex-1">{children}</main>
         <Footer />
+        <StickyDemoCTA />
       </body>
     </html>
   );

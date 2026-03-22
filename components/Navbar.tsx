@@ -3,12 +3,13 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { Menu, X } from "lucide-react";
+import { Menu, X, ArrowRight } from "lucide-react";
 
 const navLinks = [
   { label: "Features", href: "/features" },
-  { label: "AI Inbox Agent", href: "/inbox-agent" },
+  { label: "The Vortex", href: "/vortex" },
   { label: "Pricing", href: "/pricing" },
+  { label: "AI Inbox Agent", href: "/inbox-agent" },
   { label: "Blog", href: "/blog" },
 ];
 
@@ -42,7 +43,7 @@ export default function Navbar() {
           ))}
         </div>
 
-        {/* Desktop CTA */}
+        {/* Desktop CTAs */}
         <div className="hidden md:flex items-center gap-4">
           <a
             href="https://app.cerberuscrm.com"
@@ -53,10 +54,11 @@ export default function Navbar() {
             Log in
           </a>
           <Link
-            href="/pricing"
-            className="text-sm font-medium px-5 py-2.5 rounded-lg gradient-red text-white hover:opacity-90 transition-opacity duration-200"
+            href="/demo"
+            className="text-sm font-medium px-5 py-2.5 rounded-lg gradient-red text-white hover:opacity-90 transition-opacity duration-200 inline-flex items-center gap-1.5"
           >
-            Get Started
+            Schedule a Demo
+            <ArrowRight size={14} />
           </Link>
         </div>
 
@@ -94,11 +96,11 @@ export default function Navbar() {
               Log in
             </a>
             <Link
-              href="/pricing"
+              href="/demo"
               onClick={() => setMobileOpen(false)}
               className="block text-center text-sm font-medium px-5 py-2.5 rounded-lg gradient-red text-white"
             >
-              Get Started
+              Schedule a Demo
             </Link>
           </div>
         </div>

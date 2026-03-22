@@ -53,8 +53,8 @@ export default function DemoPage() {
                   },
                   {
                     icon: Video,
-                    title: "WebinarFuse Integration",
-                    desc: "Evergreen webinar funnels with real-time engagement tracking.",
+                    title: "Webinar System & Funnels",
+                    desc: "Evergreen webinar funnels with automated follow-up and co-marketing.",
                   },
                   {
                     icon: Clock,
