@@ -5,6 +5,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { Elements } from "@stripe/react-stripe-js";
 import CheckoutForm from "./CheckoutForm";
 import { Loader2 } from "lucide-react";
+import type { ProductConfig } from "@/lib/products";
 
 const stripePromise = loadStripe(
   process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!
@@ -13,25 +14,32 @@ const stripePromise = loadStripe(
 interface StripeWrapperProps {
   customerEmail?: string;
   customerName?: string;
+  product: ProductConfig;
 }
 
 export default function StripeWrapper({
   customerEmail,
   customerName,
+  product,
 }: StripeWrapperProps) {
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  const priceId = process.env[product.priceIdEnvVar];
+
   useEffect(() => {
-    const createSubscription = async () => {
+    const createSession = async () => {
       try {
         const res = await fetch("/api/create-checkout-session", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            priceId: process.env.NEXT_PUBLIC_STRIPE_CRM_PRICE_ID,
+            priceId,
             customerEmail,
             customerName,
+            productSlug: product.slug,
+            ghlPlanName: product.ghlPlanName,
+            interval: product.interval,
           }),
         });
 
@@ -49,8 +57,8 @@ export default function StripeWrapper({
       }
     };
 
-    createSubscription();
-  }, [customerEmail, customerName]);
+    createSession();
+  }, [customerEmail, customerName, priceId, product.slug, product.ghlPlanName, product.interval]);
 
   if (error) {
     return (
@@ -69,10 +77,7 @@ export default function StripeWrapper({
   if (!clientSecret) {
     return (
       <div className="card p-12 flex flex-col items-center justify-center gap-4">
-        <Loader2
-          size={24}
-          className="text-cerberus-red animate-spin"
-        />
+        <Loader2 size={24} className="text-cerberus-red animate-spin" />
         <p className="text-sm text-cerberus-steel">
           Preparing secure checkout...
         </p>
@@ -152,7 +157,7 @@ export default function StripeWrapper({
         },
       }}
     >
-      <CheckoutForm />
+      <CheckoutForm product={product} />
     </Elements>
   );
 }

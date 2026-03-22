@@ -7,12 +7,22 @@ import {
   useElements,
 } from "@stripe/react-stripe-js";
 import { Loader2, Lock, ShieldCheck } from "lucide-react";
+import type { ProductConfig } from "@/lib/products";
 
-export default function CheckoutForm() {
+interface CheckoutFormProps {
+  product: ProductConfig;
+}
+
+export default function CheckoutForm({ product }: CheckoutFormProps) {
   const stripe = useStripe();
   const elements = useElements();
   const [isProcessing, setIsProcessing] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const isRecurring = product.interval !== "one_time";
+  const buttonLabel = isRecurring
+    ? `${product.ctaText} — ${product.displayPrice}${product.billingLabel}`
+    : `${product.ctaText} — ${product.displayPrice}`;
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -24,11 +34,10 @@ export default function CheckoutForm() {
     const { error: submitError } = await stripe.confirmPayment({
       elements,
       confirmParams: {
-        return_url: `${window.location.origin}/checkout/success`,
+        return_url: `${window.location.origin}/checkout/${product.slug}/success`,
       },
     });
 
-    // Only reaches here if there's an immediate error (redirect handles success)
     if (submitError) {
       setError(
         submitError.message || "Something went wrong. Please try again."
@@ -73,7 +82,7 @@ export default function CheckoutForm() {
         ) : (
           <>
             <Lock size={16} />
-            Start My Subscription — $497/mo
+            {buttonLabel}
           </>
         )}
         <div className="absolute inset-0 bg-white/10 translate-y-full group-hover:translate-y-0 transition-transform duration-300" />
@@ -89,19 +98,21 @@ export default function CheckoutForm() {
           <Lock size={14} />
           <span className="text-xs">PCI Compliant</span>
         </div>
-        <div className="flex items-center gap-1.5 text-cerberus-steel-dark">
-          <svg
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth={2}
-            className="w-3.5 h-3.5"
-          >
-            <path d="M9 12l2 2 4-4" />
-            <circle cx="12" cy="12" r="10" />
-          </svg>
-          <span className="text-xs">Cancel Anytime</span>
-        </div>
+        {isRecurring && (
+          <div className="flex items-center gap-1.5 text-cerberus-steel-dark">
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth={2}
+              className="w-3.5 h-3.5"
+            >
+              <path d="M9 12l2 2 4-4" />
+              <circle cx="12" cy="12" r="10" />
+            </svg>
+            <span className="text-xs">Cancel Anytime</span>
+          </div>
+        )}
       </div>
     </div>
   );
