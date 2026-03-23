@@ -37,7 +37,7 @@ const testimonials: Testimonial[] = [
   {
     id: "paul-dolan",
     type: "video",
-    youtubeId: "UqnT-BAJ94g",
+    youtubeId: "qC98iU0-2zM",
     name: "Paul Dolan",
     title: "Founder & Mortgage Loan Officer",
     company: "Dolan Mortgage Team",
